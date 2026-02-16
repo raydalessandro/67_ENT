@@ -294,11 +294,11 @@ export const api = {
       supabase.from('ai_usage_stats').select('*')
     ),
 
-    getConfig: (artistId: string) => query<AIAgentConfig>(() =>
+    getConfig: (artistId: string) => query<AiAgentConfig>(() =>
       supabase.from('ai_agent_configs').select('*').eq('artist_id', artistId).single()
     ),
 
-    updateConfig: (artistId: string, config: Partial<AIAgentConfig>) => query<AIAgentConfig>(() =>
+    updateConfig: (artistId: string, config: Partial<AiAgentConfig>) => query<AiAgentConfig>(() =>
       supabase.from('ai_agent_configs')
         .update(config)
         .eq('artist_id', artistId)
