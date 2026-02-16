@@ -15,35 +15,46 @@ export function useAuth() {
   const loadUserProfile = useCallback(async (userId: string) => {
     console.log('[useAuth] Loading profile for user:', userId);
 
-    const { data: profile, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', userId)
-      .single();
+    try {
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Query timeout')), 10000)
+      );
 
-    console.log('[useAuth] User profile result:', { profile, error });
-
-    if (error || !profile) {
-      console.log('[useAuth] Setting user to null');
-      setUser(null);
-      return;
-    }
-
-    console.log('[useAuth] Setting user:', profile);
-    setUser(profile);
-
-    // If artist role, load artist profile
-    if (profile.role === 'artist') {
-      console.log('[useAuth] Loading artist profile...');
-      const { data: artistProfile, error: artistError } = await supabase
-        .from('artists')
+      const queryPromise = supabase
+        .from('users')
         .select('*')
-        .eq('user_id', userId)
-        .single();
+        .eq('id', userId)
+        .maybeSingle();
 
-      console.log('[useAuth] Artist profile result:', { artistProfile, artistError });
+      const { data: profile, error } = await Promise.race([queryPromise, timeoutPromise]) as any;
 
-      if (artistProfile) setArtist(artistProfile);
+        console.log('[useAuth] User profile result:', { profile, error });
+
+      if (error || !profile) {
+        console.log('[useAuth] Setting user to null due to error');
+        setUser(null);
+        return;
+      }
+
+      console.log('[useAuth] Setting user:', profile);
+      setUser(profile);
+
+      // If artist role, load artist profile
+      if (profile.role === 'artist') {
+        console.log('[useAuth] Loading artist profile...');
+        const { data: artistProfile, error: artistError } = await supabase
+          .from('artists')
+          .select('*')
+          .eq('user_id', userId)
+          .single();
+
+        console.log('[useAuth] Artist profile result:', { artistProfile, artistError });
+
+        if (artistProfile) setArtist(artistProfile);
+      }
+    } catch (err) {
+      console.error('[useAuth] Exception during profile load:', err);
+      setUser(null);
     }
   }, [setUser, setArtist]);
 
