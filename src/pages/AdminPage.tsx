@@ -65,7 +65,7 @@ export default function AdminPage() {
             Nuovo Artista
           </button>
           <button
-            onClick={() => navigate('/admin/ai-agents')}
+            onClick={() => navigate('/ai-chat/config')}
             className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl
                        bg-gray-800 hover:bg-gray-700 text-white font-medium text-sm
                        active:scale-[0.98] transition-all"

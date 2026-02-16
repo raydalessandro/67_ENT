@@ -11,7 +11,7 @@ import { api } from '@/lib/api';
 import type { AppError } from '@/lib/errors';
 import type { AiAgentConfigWithArtist } from '@/types/models';
 
-export default function AIAgentsListPage() {
+export default function AIAgentConfigListPage() {
   const navigate = useNavigate();
   const [configs, setConfigs] = useState<AiAgentConfigWithArtist[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -49,7 +49,7 @@ export default function AIAgentsListPage() {
           configs.map((config) => (
             <button
               key={config.id}
-              onClick={() => navigate(`/admin/ai-agents/${config.artist_id}`)}
+              onClick={() => navigate(`/ai-chat/config/${config.artist_id}`)}
               className="w-full flex items-center gap-3 p-4 rounded-xl border border-gray-800
                          bg-gray-900 hover:bg-gray-800 transition-colors text-left"
             >
