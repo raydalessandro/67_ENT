@@ -24,25 +24,33 @@ Landing page con navigazione a tutte le sezioni. Gli artisti vedono Calendario, 
 - Video: thumbnail generato client-side, compatibile iOS/Android
 
 ### 📚 Consigli & Materiali (Toolkit)
-- Sezioni con icone dinamiche
+- Sezioni con icone dinamiche (16 opzioni: Book, FileText, Lightbulb, ecc.)
 - Items espandibili con contenuto Markdown
 - Supporto allegati
 - Priorità visuale (stelle colorate)
 - Campagne con data di scadenza
 - Read tracking automatico
+- **[Staff]** FAB per creare sezioni (`/toolkit`)
+- **[Staff]** FAB per creare materiali in ogni sezione (`/toolkit/:slug`)
 
 ### 🤖 Assistente AI
-- Chat con contesto giornaliero (reset a mezzanotte)
+- **[Artisti]** Chat AI personalizzata (`/ai-chat`)
+- Contesto giornaliero (reset a mezzanotte)
 - Rate limiting configurabile per artista (default 20 msg/giorno)
-- System prompt personalizzabile per artista
-- Attivabile/disattivabile per artista da admin
+- **[Staff]** Configurazione AI (`/ai-chat/config`)
+  - Lista tutti gli agenti AI
+  - Modifica prompt per sezione: identity, activity, ontology, marketing, boundaries, extra
+  - Abilita/disabilita AI per artista
+  - Modifica parametri: model, temperature, max_tokens, daily_message_limit
 - Backend: Supabase Edge Function → DeepSeek API
+- Auto-creazione config AI al momento della creazione artista (se attivo)
 
 ### 👥 Gestione Artisti (Admin)
 - Crea artista: account auth + profilo + config AI in un colpo
 - Password auto-generabile
 - Bottone **WhatsApp** con credenziali pronte da inviare
-- Reset password, attiva/disattiva, toggle AI, elimina
+- Bottone **Configura AI** → link a `/ai-chat/config`
+- Reset password, attiva/disattiva, elimina
 - Signup pubblico disabilitato — solo staff crea account
 
 ### 🔒 Sicurezza
@@ -79,6 +87,8 @@ supabase/migrations/001_base.sql
 supabase/migrations/002_ai_chat.sql
 supabase/migrations/003_addendum.sql
 supabase/migrations/004_rpc_patch.sql
+supabase/migrations/005_posts_view.sql
+supabase/migrations/006_fix_ai_trigger.sql
 ```
 
 **Storage** — crea 2 bucket public:
