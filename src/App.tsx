@@ -75,6 +75,10 @@ function AppRoutes() {
 }
 
 export default function App() {
+  // Version check for deployment verification
+  console.log('[App] Version: BUILD_WITH_AI_CONFIG_2024-02-16');
+  console.log('[App] Features: AI Config UI, Materials Section Creation, Fixed AI Trigger');
+
   return (
     <ErrorBoundary>
       <BrowserRouter>
