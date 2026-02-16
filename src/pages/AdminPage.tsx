@@ -30,6 +30,8 @@ export default function AdminPage() {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
+  console.log('[AdminPage] VERSIONE CON AI CONFIG BUTTON - Build 56efb75');
+
   const loadArtists = useCallback(async () => {
     setIsLoading(true);
     const result = await adminApi.listArtists();
