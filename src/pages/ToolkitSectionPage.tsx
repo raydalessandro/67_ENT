@@ -4,10 +4,11 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import { Clock, ChevronDown, ChevronUp, Star } from 'lucide-react';
+import { Clock, ChevronDown, ChevronUp, Star, Plus } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { Header } from '@/components/layout/Header';
 import { LoadingSpinner, ErrorState, EmptyState, Badge } from '@/components/ui/Primitives';
+import { CreateGuidelineModal } from '@/components/guidelines/CreateGuidelineModal';
 import { api } from '@/lib/api';
 import { useAuthStore } from '@/stores/authStore';
 import { PRIORITY_CONFIG } from '@/types/enums';
@@ -22,6 +23,7 @@ export default function ToolkitSectionPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<AppError | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const fetch = useCallback(async () => {
     setIsLoading(true);
@@ -56,6 +58,7 @@ export default function ToolkitSectionPage() {
   };
 
   const sectionTitle = items[0]?.section_title ?? slug ?? 'Sezione';
+  const sectionId = items[0]?.section_id;
 
   return (
     <>
@@ -170,6 +173,31 @@ export default function ToolkitSectionPage() {
           })
         )}
       </div>
+
+      {/* FAB — Staff only */}
+      {isStaff && sectionId && (
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="fixed bottom-6 right-6 w-14 h-14 bg-indigo-600 hover:bg-indigo-500
+                     rounded-full shadow-lg flex items-center justify-center
+                     transition-colors z-40"
+          aria-label="Aggiungi materiale"
+        >
+          <Plus className="w-6 h-6 text-white" />
+        </button>
+      )}
+
+      {/* Create Modal */}
+      {showCreateModal && sectionId && (
+        <CreateGuidelineModal
+          sectionId={sectionId}
+          onClose={() => setShowCreateModal(false)}
+          onSuccess={() => {
+            fetch();
+            setShowCreateModal(false);
+          }}
+        />
+      )}
     </>
   );
 }
