@@ -25,11 +25,10 @@ export interface Artist {
   name: string;
   bio: string | null;
   color: string;
-  instagram_url: string | null;
+  instagram_handle: string | null;
+  tiktok_handle: string | null;
+  youtube_handle: string | null;
   spotify_url: string | null;
-  youtube_url: string | null;
-  tiktok_url: string | null;
-  website_url: string | null;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -65,10 +64,8 @@ export interface PostMedia {
   id: string;
   post_id: string;
   storage_path: string;
-  file_name: string;
-  file_type: string;
-  file_size: number;
   mime_type: string;
+  file_size: number | null;
   width: number | null;
   height: number | null;
   duration_seconds: number | null;
@@ -83,7 +80,6 @@ export interface PostComment {
   post_id: string;
   user_id: string;
   content: string;
-  is_system: boolean;
   created_at: string;
   user_name?: string;
   user_avatar?: string;
@@ -119,7 +115,7 @@ export interface Notification {
   title: string;
   body: string;
   data: Record<string, unknown>;
-  read: boolean;
+  is_read: boolean;
   created_at: string;
 }
 

@@ -317,15 +317,15 @@ export const api = {
     ),
 
     markRead: (id: string) => query<Notification>(() =>
-      supabase.from('notifications').update({ read: true }).eq('id', id).select().single()
+      supabase.from('notifications').update({ is_read: true }).eq('id', id).select().single()
     ),
 
     markAllRead: async (): Promise<ApiResult<void>> => {
       try {
         const { error } = await supabase
           .from('notifications')
-          .update({ read: true })
-          .eq('read', false);
+          .update({ is_read: true })
+          .eq('is_read', false);
         if (error) return { ok: false, error: mapSupabaseError(error) };
         return { ok: true, data: undefined };
       } catch (err) {
@@ -338,7 +338,7 @@ export const api = {
         const { count, error } = await supabase
           .from('notifications')
           .select('id', { count: 'exact', head: true })
-          .eq('read', false);
+          .eq('is_read', false);
         if (error) return { ok: false, error: mapSupabaseError(error) };
         return { ok: true, data: count ?? 0 };
       } catch (err) {
