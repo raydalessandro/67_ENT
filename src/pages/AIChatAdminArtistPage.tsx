@@ -22,13 +22,17 @@ export default function AIChatAdminArtistPage() {
     if (!artistId) return;
     const fetch = async () => {
       setIsLoading(true);
+      console.log('[AIChatAdminArtist] Fetching sessions for artist:', artistId);
       const result = await api.ai.getArtistSessions(artistId);
+      console.log('[AIChatAdminArtist] Sessions result:', result);
       if (result.ok) {
+        console.log('[AIChatAdminArtist] Sessions data:', result.data);
         setSessions(result.data);
         if (result.data.length > 0) {
           setSelectedSession(result.data[0].id);
         }
       } else {
+        console.error('[AIChatAdminArtist] Error:', result.error);
         setError(result.error);
       }
       setIsLoading(false);
@@ -39,8 +43,13 @@ export default function AIChatAdminArtistPage() {
   useEffect(() => {
     if (!selectedSession) return;
     const fetch = async () => {
+      console.log('[AIChatAdminArtist] Fetching messages for session:', selectedSession);
       const result = await api.ai.getSessionMessages(selectedSession);
-      if (result.ok) setMessages(result.data);
+      console.log('[AIChatAdminArtist] Messages result:', result);
+      if (result.ok) {
+        console.log('[AIChatAdminArtist] Messages data:', result.data);
+        setMessages(result.data);
+      }
     };
     fetch();
   }, [selectedSession]);

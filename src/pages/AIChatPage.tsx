@@ -77,9 +77,12 @@ export default function AIChatPage() {
     };
     setMessages((prev) => [...prev, tempUserMsg]);
 
+    console.log('[AIChatPage] Sending message:', text);
     const result = await api.ai.sendMessage({ message: text });
+    console.log('[AIChatPage] Send result:', result);
 
     if (result.ok) {
+      console.log('[AIChatPage] Message sent successfully, session_id:', result.data.session_id);
       // Add assistant response
       const assistantMsg: AIChatMessage = {
         id: `resp-${Date.now()}`,
