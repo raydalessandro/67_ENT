@@ -10,7 +10,8 @@
       "Bash(git add:*)",
       "Bash(git commit -m \"$\\(cat <<''EOF''\nFix: replace is_label with is_active in artists query\n\n- Changed api.ts artists.getAll query from is_label=false to is_active=true\n- Updated Artist interface in models.ts to use is_active instead of is_label\n- This fixes the issue where artists were not showing in the post creation form\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
       "Bash(git push:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(find:*)"
     ]
   }
 }

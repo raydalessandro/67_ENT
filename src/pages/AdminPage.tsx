@@ -3,9 +3,10 @@
 // ============================================================================
 
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   UserPlus, Users, KeyRound, Trash2, Copy, Check,
-  Loader2, ChevronDown, ChevronUp, Power, Bot,
+  Loader2, ChevronDown, ChevronUp, Power, Bot, Settings,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Header } from '@/components/layout/Header';
@@ -22,6 +23,7 @@ const COLOR_PRESETS = [
 ];
 
 export default function AdminPage() {
+  const navigate = useNavigate();
   const [artists, setArtists] = useState<ArtistListItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<AppError | null>(null);
@@ -48,17 +50,28 @@ export default function AdminPage() {
       <Header title="Gestione Artisti" />
 
       <div className="p-4 space-y-4 pb-8">
-        {/* Create button */}
-        <button
-          onClick={() => setShowCreateForm(!showCreateForm)}
-          className="flex items-center gap-2 w-full px-4 py-3 rounded-xl
-                     bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm
-                     active:scale-[0.98] transition-all"
-          data-testid="create-artist-btn"
-        >
-          <UserPlus className="w-5 h-5" />
-          Nuovo Artista
-        </button>
+        {/* Action buttons */}
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={() => setShowCreateForm(!showCreateForm)}
+            className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl
+                       bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm
+                       active:scale-[0.98] transition-all"
+            data-testid="create-artist-btn"
+          >
+            <UserPlus className="w-5 h-5" />
+            Nuovo Artista
+          </button>
+          <button
+            onClick={() => navigate('/admin/ai-agents')}
+            className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl
+                       bg-gray-800 hover:bg-gray-700 text-white font-medium text-sm
+                       active:scale-[0.98] transition-all"
+          >
+            <Settings className="w-5 h-5" />
+            Configura AI
+          </button>
+        </div>
 
         {/* Create form */}
         {showCreateForm && (

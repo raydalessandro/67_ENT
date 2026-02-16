@@ -25,6 +25,8 @@ const ToolkitPage = lazy(() => import('@/pages/ToolkitPage'));
 const ToolkitSectionPage = lazy(() => import('@/pages/ToolkitSectionPage'));
 const AIChatPageLazy = lazy(() => import('@/pages/AIChatPage'));
 const AdminPage = lazy(() => import('@/pages/AdminPage'));
+const AIAgentsListPage = lazy(() => import('@/pages/AIAgentsListPage'));
+const AIAgentConfigPage = lazy(() => import('@/pages/AIAgentConfigPage'));
 import { NotFoundPage } from '@/pages/PlaceholderPages';
 
 function AppRoutes() {
@@ -60,6 +62,8 @@ function AppRoutes() {
           <Route element={<StaffRoute />}>
             <Route path={ROUTES.POST_NEW} element={<Suspense fallback={<LoadingSpinner />}><CreatePostPage /></Suspense>} />
             <Route path={ROUTES.ADMIN} element={<Suspense fallback={<LoadingSpinner />}><AdminPage /></Suspense>} />
+            <Route path={ROUTES.AI_AGENTS_LIST} element={<Suspense fallback={<LoadingSpinner />}><AIAgentsListPage /></Suspense>} />
+            <Route path={ROUTES.AI_AGENT_CONFIG} element={<Suspense fallback={<LoadingSpinner />}><AIAgentConfigPage /></Suspense>} />
           </Route>
         </Route>
       </Route>

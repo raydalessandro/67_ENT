@@ -6,13 +6,13 @@ import { supabase } from './supabase';
 import { AppError, mapSupabaseError } from './errors';
 import type {
   ApiResult, CalendarFilters, CreatePostInput, AIChatRequest, AIChatResponse,
-  CreateGuidelineItemInput,
+  CreateGuidelineItemInput, UpdateAiAgentConfigInput,
 } from '@/types/api';
 import type {
   Post, PostWithDetails, PostMedia, PostComment, CalendarEvent,
   Notification, GuidelineSection, GuidelineItemFull, Artist,
   AIChatSessionAdmin, AIChatMessage, AIUsageInfo, AIUsageStats,
-  AIAgentConfig,
+  AiAgentConfig, AiAgentConfigWithArtist,
 } from '@/types/models';
 
 // ── Generic query wrapper ──
@@ -345,6 +345,43 @@ export const api = {
         return { ok: false, error: mapSupabaseError(err) };
       }
     },
+  },
+
+  // ── AI Agent Configs ──
+  aiAgents: {
+    getAll: () => query<AiAgentConfigWithArtist[]>(() =>
+      supabase.from('ai_agent_configs')
+        .select(`
+          *,
+          artists!inner(name, color)
+        `)
+        .order('created_at', { ascending: false })
+        .then(result => ({
+          ...result,
+          data: result.data?.map((config: any) => ({
+            ...config,
+            artist_name: config.artists.name,
+            artist_color: config.artists.color,
+            artists: undefined,
+          })) ?? []
+        }))
+    ),
+
+    getByArtist: (artistId: string) => query<AiAgentConfig>(() =>
+      supabase.from('ai_agent_configs')
+        .select('*')
+        .eq('artist_id', artistId)
+        .single()
+    ),
+
+    update: (artistId: string, data: UpdateAiAgentConfigInput, userId: string) =>
+      query<AiAgentConfig>(() =>
+        supabase.from('ai_agent_configs')
+          .update({ ...data, configured_by: userId })
+          .eq('artist_id', artistId)
+          .select()
+          .single()
+      ),
   },
 
   // ── Storage helpers ──

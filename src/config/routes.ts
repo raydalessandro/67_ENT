@@ -15,6 +15,8 @@ export const ROUTES = {
   AI_CHAT_ADMIN_ARTIST: '/ai-chat/admin/:artistId',
   AI_CHAT_ADMIN_SESSION: '/ai-chat/admin/:artistId/:sessionId',
   AI_CHAT_CONFIG: '/ai-chat/config/:artistId',
+  AI_AGENTS_LIST: '/admin/ai-agents',
+  AI_AGENT_CONFIG: '/admin/ai-agents/:artistId',
   ADMIN: '/admin',
   NOT_FOUND: '*',
 } as const;
@@ -27,4 +29,5 @@ export const routes = {
   aiChatAdminSession: (artistId: string, sessionId: string) =>
     `/ai-chat/admin/${artistId}/${sessionId}`,
   aiChatConfig: (artistId: string) => `/ai-chat/config/${artistId}`,
+  aiAgentConfig: (artistId: string) => `/admin/ai-agents/${artistId}`,
 } as const;

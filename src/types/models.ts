@@ -199,6 +199,30 @@ export interface AIChatSessionAdmin extends AIChatSession {
   total_tokens: number;
 }
 
+export interface AiAgentConfig {
+  id: string;
+  artist_id: string;
+  is_enabled: boolean;
+  model: string;
+  temperature: number;
+  max_tokens: number;
+  daily_message_limit: number;
+  prompt_identity: string | null;
+  prompt_activity: string | null;
+  prompt_ontology: string | null;
+  prompt_marketing: string | null;
+  prompt_boundaries: string | null;
+  prompt_extra: string | null;
+  configured_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AiAgentConfigWithArtist extends AiAgentConfig {
+  artist_name: string;
+  artist_color: string;
+}
+
 export interface AIChatMessage {
   id: string;
   session_id: string;

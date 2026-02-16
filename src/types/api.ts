@@ -78,3 +78,17 @@ export interface AIChatResponse {
     remaining: number;
   };
 }
+
+export interface UpdateAiAgentConfigInput {
+  is_enabled?: boolean;
+  model?: string;
+  temperature?: number;
+  max_tokens?: number;
+  daily_message_limit?: number;
+  prompt_identity?: string | null;
+  prompt_activity?: string | null;
+  prompt_ontology?: string | null;
+  prompt_marketing?: string | null;
+  prompt_boundaries?: string | null;
+  prompt_extra?: string | null;
+}
