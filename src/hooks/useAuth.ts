@@ -21,8 +21,9 @@ export function useAuth() {
       );
 
       const queryPromise = supabase
+        .schema('public')
         .from('users')
-        .select('*')
+        .select('id, email, display_name, role, avatar_url, created_at, updated_at')
         .eq('id', userId)
         .maybeSingle();
 
