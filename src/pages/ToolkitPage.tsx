@@ -4,9 +4,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, ChevronRight } from 'lucide-react';
+import { BookOpen, ChevronRight, Plus } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { LoadingSpinner, ErrorState, EmptyState } from '@/components/ui/Primitives';
+import { CreateSectionModal } from '@/components/guidelines/CreateSectionModal';
 import { api } from '@/lib/api';
 import { useAuthStore } from '@/stores/authStore';
 import { routes } from '@/config/routes';
@@ -46,6 +47,7 @@ export default function ToolkitPage() {
   const [sections, setSections] = useState<GuidelineSection[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<AppError | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const fetch = useCallback(async () => {
     setIsLoading(true);
@@ -101,6 +103,30 @@ export default function ToolkitPage() {
           ))
         )}
       </div>
+
+      {/* FAB — Staff only */}
+      {isStaff && (
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="fixed bottom-6 right-6 w-14 h-14 bg-indigo-600 hover:bg-indigo-500
+                     rounded-full shadow-lg flex items-center justify-center
+                     transition-colors z-40"
+          aria-label="Aggiungi sezione"
+        >
+          <Plus className="w-6 h-6 text-white" />
+        </button>
+      )}
+
+      {/* Create Modal */}
+      {showCreateModal && (
+        <CreateSectionModal
+          onClose={() => setShowCreateModal(false)}
+          onSuccess={() => {
+            fetch();
+            setShowCreateModal(false);
+          }}
+        />
+      )}
     </>
   );
 }
