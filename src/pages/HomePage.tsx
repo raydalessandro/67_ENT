@@ -3,7 +3,7 @@
 // ============================================================================
 
 import { Link } from 'react-router-dom';
-import { Calendar, BookOpen, Bot, ChevronRight, Settings } from 'lucide-react';
+import { Calendar, BookOpen, Bot, ChevronRight, Settings, MessageSquare } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useFeatureFlags } from '@/stores/featureFlags';
 import { LABEL_NAME } from '@/config/constants';
@@ -42,6 +42,13 @@ export default function HomePage() {
       description: 'Consulenza strategica personalizzata',
       to: ROUTES.AI_CHAT,
       show: aiChat,
+    },
+    {
+      icon: MessageSquare,
+      label: 'Chat AI Artisti',
+      description: 'Visualizza conversazioni AI degli artisti',
+      to: ROUTES.AI_CHAT_ADMIN,
+      show: isStaff,
     },
     {
       icon: Settings,

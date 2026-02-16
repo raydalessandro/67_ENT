@@ -27,6 +27,8 @@ const AIChatPageLazy = lazy(() => import('@/pages/AIChatPage'));
 const AdminPage = lazy(() => import('@/pages/AdminPage'));
 const AIAgentConfigListPage = lazy(() => import('@/pages/AIAgentConfigListPage'));
 const AIAgentConfigPage = lazy(() => import('@/pages/AIAgentConfigPage'));
+const AIChatAdminPage = lazy(() => import('@/pages/AIChatAdminPage'));
+const AIChatAdminArtistPage = lazy(() => import('@/pages/AIChatAdminArtistPage'));
 import { NotFoundPage } from '@/pages/PlaceholderPages';
 
 function AppRoutes() {
@@ -62,6 +64,8 @@ function AppRoutes() {
           <Route element={<StaffRoute />}>
             <Route path={ROUTES.AI_CHAT_CONFIG_LIST} element={<Suspense fallback={<LoadingSpinner />}><AIAgentConfigListPage /></Suspense>} />
             <Route path={ROUTES.AI_CHAT_CONFIG} element={<Suspense fallback={<LoadingSpinner />}><AIAgentConfigPage /></Suspense>} />
+            <Route path={ROUTES.AI_CHAT_ADMIN} element={<Suspense fallback={<LoadingSpinner />}><AIChatAdminPage /></Suspense>} />
+            <Route path={ROUTES.AI_CHAT_ADMIN_ARTIST} element={<Suspense fallback={<LoadingSpinner />}><AIChatAdminArtistPage /></Suspense>} />
           </Route>
 
           {/* Staff only */}
