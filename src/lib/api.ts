@@ -36,7 +36,7 @@ export const api = {
   // ── Artists ──
   artists: {
     getAll: () => query<Artist[]>(() =>
-      supabase.from('artists').select('*').eq('is_label', false).order('name')
+      supabase.from('artists').select('*').eq('is_active', true).order('name')
     ),
   },
 

@@ -30,7 +30,7 @@ export interface Artist {
   youtube_url: string | null;
   tiktok_url: string | null;
   website_url: string | null;
-  is_label: boolean;
+  is_active: boolean;
   created_at: string;
   updated_at: string;
 }
