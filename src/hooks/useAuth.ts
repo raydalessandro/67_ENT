@@ -13,26 +13,35 @@ export function useAuth() {
   const { user, artist, isStaff, isLoading, setUser, setArtist, logout: clearStore } = useAuthStore();
 
   const loadUserProfile = useCallback(async (userId: string) => {
+    console.log('[useAuth] Loading profile for user:', userId);
+
     const { data: profile, error } = await supabase
       .from('users')
       .select('*')
       .eq('id', userId)
       .single();
 
+    console.log('[useAuth] User profile result:', { profile, error });
+
     if (error || !profile) {
+      console.log('[useAuth] Setting user to null');
       setUser(null);
       return;
     }
 
+    console.log('[useAuth] Setting user:', profile);
     setUser(profile);
 
     // If artist role, load artist profile
     if (profile.role === 'artist') {
-      const { data: artistProfile } = await supabase
+      console.log('[useAuth] Loading artist profile...');
+      const { data: artistProfile, error: artistError } = await supabase
         .from('artists')
         .select('*')
         .eq('user_id', userId)
         .single();
+
+      console.log('[useAuth] Artist profile result:', { artistProfile, artistError });
 
       if (artistProfile) setArtist(artistProfile);
     }
@@ -42,11 +51,15 @@ export function useAuth() {
   useEffect(() => {
     let mounted = true;
 
+    console.log('[useAuth] Initializing auth...');
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!mounted) return;
+      console.log('[useAuth] Session:', session?.user ? 'logged in' : 'logged out');
       if (session?.user) {
         loadUserProfile(session.user.id);
       } else {
+        console.log('[useAuth] No session, setting user to null');
         setUser(null);
       }
     });
