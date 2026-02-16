@@ -42,7 +42,10 @@ export default function AIChatAdminPage() {
           artists.map((artist) => (
             <button
               key={artist.id}
-              onClick={() => navigate(`/ai-chat/admin/${artist.id}`)}
+              onClick={() => {
+                console.log('[AIChatAdminPage] Navigating to artist:', artist.id, artist.name);
+                navigate(`/ai-chat/admin/${artist.id}`);
+              }}
               className="w-full flex items-center gap-3 p-4 rounded-xl border border-gray-800 bg-gray-900 hover:bg-gray-800 transition-colors text-left"
             >
               <div
