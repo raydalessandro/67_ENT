@@ -16,6 +16,9 @@ function createMockSupabase() {
     order: vi.fn().mockReturnThis(),
     single: vi.fn().mockResolvedValue({ data: null, error: null }),
     upsert: vi.fn().mockResolvedValue({ data: null, error: null }),
+    auth: {
+      getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null }),
+    },
   }
   chain.then = vi.fn((resolve: any) =>
     Promise.resolve({ data: [], error: null }).then(resolve)
@@ -143,14 +146,17 @@ describe('guidelines.ts', () => {
   // ── markRead ──
 
   describe('markRead', () => {
-    it('upserts into guideline_reads with item_id (idempotent)', async () => {
+    it('upserts into guideline_reads with guideline_item_id and user_id (idempotent)', async () => {
       chain.upsert = vi.fn().mockResolvedValue({ data: null, error: null })
 
       const { markRead } = await import('./guidelines')
       const result = await markRead('item-1')
 
       expect(chain.from).toHaveBeenCalledWith('guideline_reads')
-      expect(chain.upsert).toHaveBeenCalledWith({ item_id: 'item-1' })
+      expect(chain.upsert).toHaveBeenCalledWith(
+        { guideline_item_id: 'item-1', user_id: 'user-1' },
+        { onConflict: 'user_id,guideline_item_id' }
+      )
       expect(result.ok).toBe(true)
     })
 

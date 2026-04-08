@@ -49,7 +49,11 @@ export async function getPost(
 
 export async function createPost(input: CreatePostInput): Promise<ApiResult<Post>> {
   const supabase = createBrowserClient()
-  return query<Post>(supabase.from('posts').insert(input).select().single())
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { ok: false, error: createError('UNAUTHORIZED', 'Not authenticated', 'Devi effettuare il login') }
+  return query<Post>(
+    supabase.from('posts').insert({ ...input, created_by: user.id }).select().single()
+  )
 }
 
 export async function updatePost(id: string, input: UpdatePostInput): Promise<ApiResult<Post>> {
@@ -72,16 +76,25 @@ export async function sendForReview(id: string): Promise<ApiResult<Post>> {
   )
   if (!result.ok) return result
 
-  // Notification insert — non-fatal
-  try {
-    await supabase.from('notifications').insert({
-      type: 'post_review',
-      related_post_id: id,
-      title: 'Post inviato in revisione',
-      message: `Il post è stato inviato in revisione.`,
-    })
-  } catch {
-    // non-fatal
+  // Notification to artist — non-fatal
+  if (result.ok) {
+    try {
+      const { data: post } = await supabase.from('posts').select('artist_id').eq('id', id).single()
+      if (post) {
+        const { data: artist } = await supabase.from('artists').select('user_id').eq('id', post.artist_id).single()
+        if (artist) {
+          await supabase.from('notifications').insert({
+            user_id: artist.user_id,
+            type: 'post_review',
+            related_post_id: id,
+            title: 'Post inviato in revisione',
+            message: 'Il post è stato inviato in revisione.',
+          })
+        }
+      }
+    } catch {
+      // non-fatal
+    }
   }
 
   return result
@@ -100,16 +113,19 @@ export async function approve(id: string): Promise<ApiResult<Post>> {
   )
   if (!result.ok) return result
 
-  // Notification insert — non-fatal
-  try {
-    await supabase.from('notifications').insert({
-      type: 'post_approved',
-      related_post_id: id,
-      title: 'Post approvato',
-      message: `Il post è stato approvato.`,
-    })
-  } catch {
-    // non-fatal
+  // Notification to post creator — non-fatal
+  if (result.ok) {
+    try {
+      await supabase.from('notifications').insert({
+        user_id: result.data.created_by,
+        type: 'post_approved',
+        related_post_id: id,
+        title: 'Post approvato',
+        message: 'Il post è stato approvato.',
+      })
+    } catch {
+      // non-fatal
+    }
   }
 
   return result
@@ -135,16 +151,19 @@ export async function reject(id: string, reason: string): Promise<ApiResult<Post
   )
   if (!result.ok) return result
 
-  // Notification insert — non-fatal
-  try {
-    await supabase.from('notifications').insert({
-      type: 'post_rejected',
-      related_post_id: id,
-      title: 'Post rifiutato',
-      message: reason,
-    })
-  } catch {
-    // non-fatal
+  // Notification to post creator — non-fatal
+  if (result.ok) {
+    try {
+      await supabase.from('notifications').insert({
+        user_id: result.data.created_by,
+        type: 'post_rejected',
+        related_post_id: id,
+        title: 'Post rifiutato',
+        message: reason,
+      })
+    } catch {
+      // non-fatal
+    }
   }
 
   return result
@@ -177,8 +196,10 @@ export async function addComment(
   content: string
 ): Promise<ApiResult<PostComment>> {
   const supabase = createBrowserClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { ok: false, error: createError('UNAUTHORIZED', 'Not authenticated', 'Devi effettuare il login') }
   return query<PostComment>(
-    supabase.from('post_comments').insert({ post_id: postId, content }).select().single()
+    supabase.from('post_comments').insert({ post_id: postId, content, user_id: user.id }).select().single()
   )
 }
 

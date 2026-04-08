@@ -21,6 +21,9 @@ function createMockSupabase() {
     single: vi.fn().mockResolvedValue(mockResult),
     upsert: vi.fn().mockReturnThis(),
     schema: vi.fn().mockReturnThis(),
+    auth: {
+      getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null }),
+    },
   }
   // Make the chain itself thenable so query() can await it
   chain.then = vi.fn((resolve: any) => Promise.resolve(mockResult).then(resolve))
@@ -249,7 +252,7 @@ describe('posts.ts', () => {
       const result = await addComment('p1', 'Great!')
 
       expect(chain.from).toHaveBeenCalledWith('post_comments')
-      expect(chain.insert).toHaveBeenCalledWith({ post_id: 'p1', content: 'Great!' })
+      expect(chain.insert).toHaveBeenCalledWith({ post_id: 'p1', content: 'Great!', user_id: 'user-1' })
       expect(result.ok).toBe(true)
     })
   })

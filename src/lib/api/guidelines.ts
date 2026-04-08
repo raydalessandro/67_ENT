@@ -52,8 +52,13 @@ export async function createItem(
   input: CreateGuidelineInput
 ): Promise<ApiResult<GuidelineItem>> {
   const supabase = createBrowserClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    const { createError } = await import('@/lib/api/errors')
+    return { ok: false, error: createError('UNAUTHORIZED', 'Not authenticated', 'Devi effettuare il login') }
+  }
   return query<GuidelineItem>(
-    supabase.from('guideline_items').insert(input).select().single()
+    supabase.from('guideline_items').insert({ ...input, created_by: user.id }).select().single()
   )
 }
 
@@ -69,9 +74,17 @@ export async function updateItem(
 
 export async function markRead(itemId: string): Promise<ApiResult<void>> {
   const supabase = createBrowserClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    const { createError } = await import('@/lib/api/errors')
+    return { ok: false, error: createError('UNAUTHORIZED', 'Not authenticated', 'Devi effettuare il login') }
+  }
   const { error } = await supabase
     .from('guideline_reads')
-    .upsert({ item_id: itemId })
+    .upsert(
+      { guideline_item_id: itemId, user_id: user.id },
+      { onConflict: 'user_id,guideline_item_id' }
+    )
   if (error) {
     const { mapSupabaseError } = await import('@/lib/api/errors')
     return { ok: false, error: mapSupabaseError(error) }
