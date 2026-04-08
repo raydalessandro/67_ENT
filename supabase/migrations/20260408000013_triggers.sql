@@ -1,0 +1,9 @@
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.users FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.artists FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.posts FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.guideline_sections FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.guideline_items FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.ai_agent_configs FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+CREATE TRIGGER log_status_change BEFORE UPDATE ON public.posts FOR EACH ROW EXECUTE FUNCTION log_post_status_change();
+CREATE TRIGGER validate_transition BEFORE UPDATE ON public.posts FOR EACH ROW EXECUTE FUNCTION validate_post_transition();
+CREATE TRIGGER create_ai_config AFTER INSERT ON public.artists FOR EACH ROW EXECUTE FUNCTION auto_create_ai_config();
