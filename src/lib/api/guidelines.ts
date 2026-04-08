@@ -101,7 +101,7 @@ export async function getUnreadCount(sectionId?: string): Promise<ApiResult<numb
 
   if (sectionId) q = q.eq('section_id', sectionId)
 
-  const result = await query<GuidelineItem[]>(q)
+  const result = await query<GuidelineItem[]>(q as any)
   if (!result.ok) return result
   return { ok: true, data: (result.data ?? []).length }
 }

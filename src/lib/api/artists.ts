@@ -48,7 +48,7 @@ function generatePassword(): string {
 export async function getArtists(): Promise<ApiResult<Artist[]>> {
   const supabase = createBrowserClient()
   const result = await query<Artist[]>(
-    supabase.from('artists').select(ARTIST_COLUMNS).order('name')
+    supabase.from('artists').select(ARTIST_COLUMNS).order('name') as any
   )
   if (!result.ok) return result
   return { ok: true, data: result.data ?? [] }

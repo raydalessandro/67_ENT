@@ -41,7 +41,7 @@ export async function markAllRead(): Promise<ApiResult<void>> {
 export async function getUnreadCount(): Promise<ApiResult<number>> {
   const supabase = createBrowserClient()
   const result = await query<Notification[]>(
-    supabase.from('notifications').select('id').eq('is_read', false)
+    supabase.from('notifications').select('id').eq('is_read', false) as any
   )
   if (!result.ok) return result
   return { ok: true, data: (result.data ?? []).length }
