@@ -54,55 +54,71 @@ export async function getArtists(): Promise<ApiResult<Artist[]>> {
   return { ok: true, data: result.data ?? [] }
 }
 
-export async function createArtist(input: CreateArtistInput): Promise<ApiResult<Artist>> {
-  const supabase = createBrowserClient()
-  const password = input.password ?? generatePassword()
-  const payload = {
-    name: input.name,
-    email: input.email,
-    password,
-    color: input.color,
-    instagram_handle: input.instagram_handle,
-    tiktok_handle: input.tiktok_handle,
-    youtube_handle: input.youtube_handle,
-    spotify_handle: input.spotify_handle,
-    instagram_token: input.instagram_token,
+export async function createArtist(input: CreateArtistInput): Promise<ApiResult<Artist & { password?: string }>> {
+  try {
+    const res = await fetch('/api/artists', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    })
+    const data = await res.json()
+    if (!res.ok) {
+      const { createError } = await import('@/lib/api/errors')
+      return { ok: false, error: createError('UNKNOWN', data.error || 'Errore creazione artista', data.error || 'Errore durante la creazione') }
+    }
+    return { ok: true, data: { ...data.artist, password: data.password } }
+  } catch (err) {
+    const { createError } = await import('@/lib/api/errors')
+    return { ok: false, error: createError('NETWORK_ERROR', String(err), 'Errore di rete') }
   }
-  return query<Artist>(supabase.rpc('create_artist_atomic', payload))
 }
 
 export async function updateArtist(
   id: string,
   input: UpdateArtistInput
 ): Promise<ApiResult<Artist>> {
-  const supabase = createBrowserClient()
-  return query<Artist>(
-    supabase.from('artists').update(input).eq('id', id).select(ARTIST_COLUMNS).single()
-  )
+  try {
+    const res = await fetch(`/api/artists/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    })
+    const data = await res.json()
+    if (!res.ok) {
+      const { createError } = await import('@/lib/api/errors')
+      return { ok: false, error: createError('UNKNOWN', data.error, data.error) }
+    }
+    return { ok: true, data: data.artist }
+  } catch (err) {
+    const { createError } = await import('@/lib/api/errors')
+    return { ok: false, error: createError('NETWORK_ERROR', String(err), 'Errore di rete') }
+  }
 }
 
 export async function deactivateArtist(id: string): Promise<ApiResult<void>> {
-  const supabase = createBrowserClient()
-  const { error } = await supabase.rpc('deactivate_artist', { artist_id: id })
-  if (error) {
-    const { mapSupabaseError } = await import('@/lib/api/errors')
-    return { ok: false, error: mapSupabaseError(error) }
-  }
-  return { ok: true, data: undefined }
+  return updateArtist(id, { is_active: false }).then(
+    (r) => (r.ok ? { ok: true as const, data: undefined } : r)
+  )
 }
 
 export async function resetPassword(
-  userId: string,
+  artistId: string,
   newPassword: string
 ): Promise<ApiResult<void>> {
-  const supabase = createBrowserClient()
-  const { error } = await supabase.rpc('reset_user_password', {
-    target_user_id: userId,
-    new_password: newPassword,
-  })
-  if (error) {
-    const { mapSupabaseError } = await import('@/lib/api/errors')
-    return { ok: false, error: mapSupabaseError(error) }
+  try {
+    const res = await fetch(`/api/artists/${artistId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: newPassword }),
+    })
+    if (!res.ok) {
+      const data = await res.json()
+      const { createError } = await import('@/lib/api/errors')
+      return { ok: false, error: createError('UNKNOWN', data.error, data.error) }
+    }
+    return { ok: true, data: undefined }
+  } catch (err) {
+    const { createError } = await import('@/lib/api/errors')
+    return { ok: false, error: createError('NETWORK_ERROR', String(err), 'Errore di rete') }
   }
-  return { ok: true, data: undefined }
 }

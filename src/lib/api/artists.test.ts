@@ -28,6 +28,7 @@ describe('artists.ts', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.restoreAllMocks()
     chain = createMockSupabase()
     ;(createBrowserClient as any).mockReturnValue(chain)
   })
@@ -46,7 +47,6 @@ describe('artists.ts', () => {
       expect(chain.from).toHaveBeenCalledWith('artists')
       const selectArg: string = chain.select.mock.calls[0][0]
       expect(selectArg).not.toContain('instagram_token_expires_at')
-      // The columns list should contain the basic artist fields
       expect(selectArg).toContain('id')
       expect(selectArg).toContain('name')
       expect(selectArg).toContain('is_active')
@@ -58,60 +58,64 @@ describe('artists.ts', () => {
   // ── createArtist ──
 
   describe('createArtist', () => {
-    it('calls create_artist_atomic RPC', async () => {
+    it('calls POST /api/artists and returns artist with password', async () => {
       const artist = { id: 'a1', name: 'Test Artist' }
-      chain.rpc = vi.fn().mockResolvedValue({ data: artist, error: null })
+      vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+        new Response(JSON.stringify({ artist, password: 'gen123' }), { status: 201 })
+      )
 
       const { createArtist } = await import('./artists')
       const result = await createArtist({ name: 'Test Artist', email: 'test@test.com' })
 
-      expect(chain.rpc).toHaveBeenCalledWith('create_artist_atomic', expect.objectContaining({
-        name: 'Test Artist',
-        email: 'test@test.com',
+      expect(globalThis.fetch).toHaveBeenCalledWith('/api/artists', expect.objectContaining({
+        method: 'POST',
       }))
       expect(result.ok).toBe(true)
+      if (result.ok) {
+        expect(result.data.name).toBe('Test Artist')
+        expect(result.data.password).toBe('gen123')
+      }
     })
 
-    it('auto-generates password if not provided', async () => {
-      const artist = { id: 'a1', name: 'Test Artist' }
-      chain.rpc = vi.fn().mockResolvedValue({ data: artist, error: null })
+    it('returns error on API failure', async () => {
+      vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+        new Response(JSON.stringify({ error: 'Email già in uso' }), { status: 400 })
+      )
 
       const { createArtist } = await import('./artists')
-      await createArtist({ name: 'Test Artist', email: 'test@test.com' })
+      const result = await createArtist({ name: 'Test', email: 'dup@test.com' })
 
-      const rpcPayload = chain.rpc.mock.calls[0][1]
-      expect(rpcPayload.password).toBeDefined()
-      expect(typeof rpcPayload.password).toBe('string')
-      expect(rpcPayload.password.length).toBeGreaterThan(0)
+      expect(result.ok).toBe(false)
     })
 
-    it('uses provided password when given', async () => {
-      const artist = { id: 'a1', name: 'Test Artist' }
-      chain.rpc = vi.fn().mockResolvedValue({ data: artist, error: null })
+    it('returns network error on fetch failure', async () => {
+      vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('Network down'))
 
       const { createArtist } = await import('./artists')
-      await createArtist({ name: 'Test Artist', email: 'test@test.com', password: 'myPass123' })
+      const result = await createArtist({ name: 'Test', email: 'test@test.com' })
 
-      const rpcPayload = chain.rpc.mock.calls[0][1]
-      expect(rpcPayload.password).toBe('myPass123')
+      expect(result.ok).toBe(false)
+      if (!result.ok) {
+        expect(result.error.code).toBe('NETWORK_ERROR')
+      }
     })
   })
 
   // ── updateArtist ──
 
   describe('updateArtist', () => {
-    it('updates artists table by id with explicit column selection', async () => {
+    it('calls PATCH /api/artists/[id] and returns updated artist', async () => {
       const artist = { id: 'a1', name: 'Updated' }
-      chain.single = vi.fn().mockResolvedValue({ data: artist, error: null })
+      vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+        new Response(JSON.stringify({ artist }), { status: 200 })
+      )
 
       const { updateArtist } = await import('./artists')
       const result = await updateArtist('a1', { name: 'Updated' })
 
-      expect(chain.from).toHaveBeenCalledWith('artists')
-      expect(chain.update).toHaveBeenCalledWith({ name: 'Updated' })
-      expect(chain.eq).toHaveBeenCalledWith('id', 'a1')
-      const selectArg: string = chain.select.mock.calls[0][0]
-      expect(selectArg).not.toContain('instagram_token_expires_at')
+      expect(globalThis.fetch).toHaveBeenCalledWith('/api/artists/a1', expect.objectContaining({
+        method: 'PATCH',
+      }))
       expect(result.ok).toBe(true)
     })
   })
@@ -119,42 +123,37 @@ describe('artists.ts', () => {
   // ── deactivateArtist ──
 
   describe('deactivateArtist', () => {
-    it('calls deactivate_artist RPC with artist_id', async () => {
-      chain.rpc = vi.fn().mockResolvedValue({ data: null, error: null })
+    it('calls updateArtist with is_active: false', async () => {
+      const artist = { id: 'a1', is_active: false }
+      vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+        new Response(JSON.stringify({ artist }), { status: 200 })
+      )
 
       const { deactivateArtist } = await import('./artists')
       const result = await deactivateArtist('a1')
 
-      expect(chain.rpc).toHaveBeenCalledWith('deactivate_artist', { artist_id: 'a1' })
+      const body = JSON.parse((globalThis.fetch as any).mock.calls[0][1].body)
+      expect(body.is_active).toBe(false)
       expect(result.ok).toBe(true)
-    })
-
-    it('returns error when RPC fails', async () => {
-      chain.rpc = vi.fn().mockResolvedValue({
-        data: null,
-        error: { message: 'fail', code: 'UNKNOWN' },
-      })
-
-      const { deactivateArtist } = await import('./artists')
-      const result = await deactivateArtist('a1')
-
-      expect(result.ok).toBe(false)
     })
   })
 
   // ── resetPassword ──
 
   describe('resetPassword', () => {
-    it('calls reset_user_password RPC with target_user_id and new_password', async () => {
-      chain.rpc = vi.fn().mockResolvedValue({ data: null, error: null })
+    it('calls POST /api/artists/[id] with password', async () => {
+      vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+        new Response(JSON.stringify({ ok: true }), { status: 200 })
+      )
 
       const { resetPassword } = await import('./artists')
-      const result = await resetPassword('user-1', 'newPass!')
+      const result = await resetPassword('a1', 'newPass!')
 
-      expect(chain.rpc).toHaveBeenCalledWith('reset_user_password', {
-        target_user_id: 'user-1',
-        new_password: 'newPass!',
-      })
+      expect(globalThis.fetch).toHaveBeenCalledWith('/api/artists/a1', expect.objectContaining({
+        method: 'POST',
+      }))
+      const body = JSON.parse((globalThis.fetch as any).mock.calls[0][1].body)
+      expect(body.password).toBe('newPass!')
       expect(result.ok).toBe(true)
     })
   })
