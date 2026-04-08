@@ -51,12 +51,21 @@ export async function registerPushSubscription(
   input: PushSubscriptionInput
 ): Promise<ApiResult<void>> {
   const supabase = createBrowserClient()
-  const { error } = await supabase.from('push_subscriptions').upsert({
-    endpoint: input.endpoint,
-    p256dh: input.keys.p256dh,
-    auth: input.keys.auth,
-    user_agent: input.userAgent,
-  })
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    const { createError } = await import('@/lib/api/errors')
+    return { ok: false, error: createError('UNAUTHORIZED', 'Not authenticated', 'Devi effettuare il login') }
+  }
+  const { error } = await supabase.from('push_subscriptions').upsert(
+    {
+      user_id: user.id,
+      endpoint: input.endpoint,
+      keys_p256dh: input.keys.p256dh,
+      keys_auth: input.keys.auth,
+      user_agent: input.userAgent,
+    },
+    { onConflict: 'endpoint' }
+  )
   if (error) {
     const { mapSupabaseError } = await import('@/lib/api/errors')
     return { ok: false, error: mapSupabaseError(error) }

@@ -42,10 +42,9 @@ export async function POST(req: NextRequest) {
       {
         user_id: authUser.id,
         endpoint,
-        p256dh,
-        auth,
+        keys_p256dh: p256dh,
+        keys_auth: auth,
         user_agent: typeof userAgent === 'string' ? userAgent : null,
-        updated_at: new Date().toISOString(),
       },
       { onConflict: 'endpoint' }
     )
