@@ -10,7 +10,7 @@ export function KpiCard({
   icon: string
   subtitle?: string
   trend?: 'up' | 'down' | 'neutral'
-}): JSX.Element {
+}): React.ReactElement {
   return (
     <div
       className="group rounded-xl p-5 transition-all duration-200"

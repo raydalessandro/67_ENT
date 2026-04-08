@@ -1,7 +1,7 @@
 import type { InstagramAccount } from '@/types/models'
 import Image from 'next/image'
 
-export function AccountOverview({ account }: { account: InstagramAccount }): JSX.Element {
+export function AccountOverview({ account }: { account: InstagramAccount }): React.ReactElement {
   return (
     <div
       className="rounded-xl p-6"
@@ -78,7 +78,7 @@ export function AccountOverview({ account }: { account: InstagramAccount }): JSX
   )
 }
 
-function StatCell({ label, value }: { label: string; value: number }): JSX.Element {
+function StatCell({ label, value }: { label: string; value: number }): React.ReactElement {
   return (
     <div className="flex flex-col items-center gap-1">
       <span

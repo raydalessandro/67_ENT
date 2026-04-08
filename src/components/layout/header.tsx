@@ -123,8 +123,7 @@ export function Header() {
         <div className="flex items-center gap-2">
           {/* User dropdown */}
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-2 h-9 px-2">
+            <DropdownMenuTrigger className="flex items-center gap-2 h-9 px-2 rounded-md hover:bg-white/10">
                 <Avatar className="h-7 w-7">
                   <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
                     {initials}
@@ -133,7 +132,6 @@ export function Header() {
                 <span className="hidden sm:block text-sm max-w-[120px] truncate">
                   {user.display_name}
                 </span>
-              </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-52">
               <DropdownMenuLabel className="flex flex-col gap-1">
@@ -145,19 +143,15 @@ export function Header() {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               {isAdmin && (
-                <DropdownMenuItem asChild>
-                  <Link href="/admin" className="flex items-center gap-2 cursor-pointer">
-                    <Settings className="h-4 w-4" />
-                    Impostazioni
-                  </Link>
+                <DropdownMenuItem className="cursor-pointer" onClick={() => window.location.href = '/admin'}>
+                  <Settings className="h-4 w-4" />
+                  Impostazioni
                 </DropdownMenuItem>
               )}
               {isStaff && (
-                <DropdownMenuItem asChild>
-                  <Link href="/admin/artists" className="flex items-center gap-2 cursor-pointer">
-                    <Users className="h-4 w-4" />
-                    Artisti
-                  </Link>
+                <DropdownMenuItem className="cursor-pointer" onClick={() => window.location.href = '/admin/artists'}>
+                  <Users className="h-4 w-4" />
+                  Artisti
                 </DropdownMenuItem>
               )}
               {(isAdmin || isStaff) && <DropdownMenuSeparator />}
@@ -173,11 +167,9 @@ export function Header() {
 
           {/* Mobile hamburger */}
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden h-9 w-9">
+            <SheetTrigger className="md:hidden inline-flex items-center justify-center h-9 w-9 rounded-md hover:bg-white/10">
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">Menu</span>
-              </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-64 bg-card border-border">
               <SheetHeader>

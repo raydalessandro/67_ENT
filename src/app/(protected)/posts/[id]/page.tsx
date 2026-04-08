@@ -170,7 +170,7 @@ export default function PostDetailPage() {
             <h1 className="text-xl font-bold text-white">{post.title}</h1>
             <p className="mt-1 text-sm text-gray-500">
               Artista:{' '}
-              <span style={{ color: post.artist_color ?? '#F5C518' }}>
+              <span style={{ color: (post as any).artist_color ?? '#F5C518' }}>
                 {(post as any).artist_name ?? post.artist_id}
               </span>
             </p>

@@ -12,7 +12,7 @@ import {
 } from 'recharts'
 import type { InstagramInsight } from '@/types/models'
 
-export function EngagementChart({ insights }: { insights: InstagramInsight[] }): JSX.Element {
+export function EngagementChart({ insights }: { insights: InstagramInsight[] }): React.ReactElement {
   // Build chart data: one row per insight, showing the latest value
   const chartData = insights.map((insight) => {
     const latestValue =
@@ -62,7 +62,7 @@ export function EngagementChart({ insights }: { insights: InstagramInsight[] }):
               color: '#fff',
               fontSize: 13,
             }}
-            formatter={(value: number) => [formatCompact(value), 'Valore']}
+            formatter={(value) => [formatCompact(value as number), 'Valore']}
             cursor={{ fill: 'rgba(245, 197, 24, 0.06)' }}
           />
           <Bar
