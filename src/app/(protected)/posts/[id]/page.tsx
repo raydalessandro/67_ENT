@@ -274,8 +274,8 @@ export default function PostDetailPage() {
 
         {/* Workflow actions */}
         <div className="mb-8 flex flex-wrap gap-2">
-          {/* Artist: send for review when draft */}
-          {!isStaff && post.status === 'draft' && (
+          {/* Staff: send for review when draft */}
+          {isStaff && post.status === 'draft' && (
             <Button
               onClick={handleSendForReview}
               disabled={actionLoading}
@@ -286,8 +286,8 @@ export default function PostDetailPage() {
             </Button>
           )}
 
-          {/* Staff: approve when in_review */}
-          {isStaff && post.status === 'in_review' && (
+          {/* Artist: approve/reject when in_review */}
+          {!isStaff && post.status === 'in_review' && (
             <>
               <Button
                 onClick={handleApprove}

@@ -60,6 +60,8 @@ export interface PostWithDetails extends Post {
   artist_color: string
   media_count: number
   comment_count: number
+  first_media_url: string | null
+  first_media_type: string | null
 }
 
 export interface PostMedia {

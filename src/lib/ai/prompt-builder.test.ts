@@ -45,6 +45,8 @@ function makePost(overrides: Partial<PostWithDetails> = {}): PostWithDetails {
     artist_color: '#ff0000',
     media_count: 0,
     comment_count: 0,
+    first_media_url: null,
+    first_media_type: null,
     ...overrides,
   }
 }

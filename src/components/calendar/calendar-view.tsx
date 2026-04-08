@@ -4,7 +4,7 @@ import { useMemo } from 'react'
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
-import type { EventClickArg } from '@fullcalendar/core'
+import type { EventClickArg, EventContentArg } from '@fullcalendar/core'
 import type { DateClickArg } from '@fullcalendar/interaction'
 import type { PostWithDetails, PostStatus } from '@/types/models'
 
@@ -75,6 +75,28 @@ export function CalendarView({
   isLoading,
 }: CalendarViewProps) {
   const events = useMemo(() => mapPostsToEvents(posts), [posts])
+
+  function renderEventContent(arg: EventContentArg) {
+    const post = arg.event.extendedProps.post as PostWithDetails
+    const hasThumb = post.first_media_url && post.first_media_type === 'image'
+    const hasVideo = post.first_media_url && post.first_media_type === 'video'
+
+    return (
+      <div className="fc-custom-event">
+        {hasThumb && (
+          <img
+            src={post.first_media_url!}
+            alt=""
+            className="fc-event-thumb"
+          />
+        )}
+        {hasVideo && !hasThumb && (
+          <span className="fc-event-video-badge" title="Video">&#9654;</span>
+        )}
+        <span className="fc-event-title">{arg.event.title}</span>
+      </div>
+    )
+  }
 
   function handleEventClick(info: EventClickArg) {
     onEventClick(info.event.id)
@@ -191,12 +213,46 @@ export function CalendarView({
         .fc-dark-theme .fc .fc-day-other .fc-daygrid-day-number {
           color: #4b5563;
         }
+        /* Custom event with thumbnail */
+        .fc-custom-event {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          overflow: hidden;
+          width: 100%;
+        }
+        .fc-event-thumb {
+          width: 20px;
+          height: 20px;
+          border-radius: 3px;
+          object-fit: cover;
+          flex-shrink: 0;
+        }
+        .fc-event-video-badge {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 20px;
+          height: 20px;
+          border-radius: 3px;
+          background: rgba(0, 0, 0, 0.4);
+          font-size: 10px;
+          flex-shrink: 0;
+          color: #fff;
+        }
+        .fc-event-title {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          line-height: 1.3;
+        }
       `}</style>
       <FullCalendar
         plugins={[dayGridPlugin, interactionPlugin]}
         initialView="dayGridMonth"
         locale="it"
         events={events}
+        eventContent={renderEventContent}
         eventClick={handleEventClick}
         dateClick={onDateClick ? handleDateClick : undefined}
         headerToolbar={{
